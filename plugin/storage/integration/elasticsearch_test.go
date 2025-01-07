@@ -141,16 +141,11 @@ func (s *ESStorageIntegration) initSpanstore(t *testing.T, allTagsAsFields bool)
 	s.TraceReader = v1adapter.NewTraceReader(spanReader)
 	archiveTraceReader, err := f.CreateArchiveSpanReader()
 	require.NoError(t, err)
-<<<<<<< HEAD
-
-	dependencyReader, err := f.CreateDependencyReader()
-=======
 	s.ArchiveTraceReader = v1adapter.NewTraceReader(archiveTraceReader)
 	archiveTraceWriter, err := f.CreateArchiveSpanWriter()
 	require.NoError(t, err)
 	s.ArchiveTraceWriter = v1adapter.NewTraceWriter(archiveTraceWriter)
-	s.DependencyReader, err = f.CreateDependencyReader()
->>>>>>> 037456e1 (Return error if when archive reader writer is not created)
+	dependencyReader, err := f.CreateDependencyReader()
 	require.NoError(t, err)
 	s.DependencyReader = v1adapter.NewDependencyReader(dependencyReader)
 
