@@ -139,10 +139,18 @@ func (s *ESStorageIntegration) initSpanstore(t *testing.T, allTagsAsFields bool)
 	spanReader, err := f.CreateSpanReader()
 	require.NoError(t, err)
 	s.TraceReader = v1adapter.NewTraceReader(spanReader)
-	s.ArchiveTraceReader, s.ArchiveTraceWriter = v1adapter.InitializeArchiveStorage(s.factory, zaptest.NewLogger(t, zaptest.WrapOptions(zap.AddCaller())))
+	archiveTraceReader, err := f.CreateArchiveSpanReader()
 	require.NoError(t, err)
+<<<<<<< HEAD
 
 	dependencyReader, err := f.CreateDependencyReader()
+=======
+	s.ArchiveTraceReader = v1adapter.NewTraceReader(archiveTraceReader)
+	archiveTraceWriter, err := f.CreateArchiveSpanWriter()
+	require.NoError(t, err)
+	s.ArchiveTraceWriter = v1adapter.NewTraceWriter(archiveTraceWriter)
+	s.DependencyReader, err = f.CreateDependencyReader()
+>>>>>>> 037456e1 (Return error if when archive reader writer is not created)
 	require.NoError(t, err)
 	s.DependencyReader = v1adapter.NewDependencyReader(dependencyReader)
 
