@@ -43,10 +43,7 @@ func (s *GRPCStorageIntegrationTestSuite) initialize(t *testing.T) {
 	spanReader, err := f.CreateSpanReader()
 	require.NoError(t, err)
 	s.TraceReader = v1adapter.NewTraceReader(spanReader)
-	s.ArchiveSpanReader, err = f.CreateArchiveSpanReader()
-	require.NoError(t, err)
-	s.ArchiveSpanWriter, err = f.CreateArchiveSpanWriter()
-	require.NoError(t, err)
+	s.ArchiveTraceReader, s.ArchiveTraceWriter = v1adapter.InitializeArchiveStorage(s.factory, zaptest.NewLogger(t, zaptest.WrapOptions(zap.AddCaller())))
 
 	// TODO DependencyWriter is not implemented in grpc store
 

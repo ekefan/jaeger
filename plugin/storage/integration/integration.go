@@ -26,7 +26,6 @@ import (
 	"github.com/jaegertracing/jaeger/model"
 	"github.com/jaegertracing/jaeger/storage/dependencystore"
 	"github.com/jaegertracing/jaeger/storage/samplingstore"
-	"github.com/jaegertracing/jaeger/storage/spanstore"
 	"github.com/jaegertracing/jaeger/storage_v2/depstore"
 	"github.com/jaegertracing/jaeger/storage_v2/tracestore"
 	"github.com/jaegertracing/jaeger/storage_v2/v1adapter"
@@ -46,8 +45,8 @@ var fixtures embed.FS
 type StorageIntegration struct {
 	TraceWriter       tracestore.Writer
 	TraceReader       tracestore.Reader
-	ArchiveSpanReader spanstore.Reader
-	ArchiveSpanWriter spanstore.Writer
+	ArchiveTraceReader tracestore.Reader
+	ArchiveTraceWriter tracestore.Writer
 	DependencyWriter  dependencystore.Writer
 	DependencyReader  depstore.Reader
 	SamplingStore     samplingstore.Store
@@ -190,7 +189,7 @@ func (s *StorageIntegration) testArchiveTrace(t *testing.T) {
 	}
 	defer s.cleanUp(t)
 	tID := model.NewTraceID(uint64(11), uint64(22))
-	expected := &model.Span{
+	expectedSpan := &model.Span{
 		OperationName: "archive_span",
 		StartTime:     time.Now().Add(-time.Hour * 72 * 5).Truncate(time.Microsecond),
 		TraceID:       tID,
@@ -198,17 +197,25 @@ func (s *StorageIntegration) testArchiveTrace(t *testing.T) {
 		References:    []model.SpanRef{},
 		Process:       model.NewProcess("archived_service", model.KeyValues{}),
 	}
+	expectedTrace := &model.Trace{
+		Spans: []*model.Span{
+			expectedSpan,
+		},
+	}
+	require.NoError(t, s.ArchiveTraceWriter.WriteTraces(context.Background(), v1adapter.V1TraceToOtelTrace(expectedTrace)))
 
-	require.NoError(t, s.ArchiveSpanWriter.WriteSpan(context.Background(), expected))
-
-	var actual *model.Trace
+	var actualTrace *model.Trace
 	found := s.waitForCondition(t, func(_ *testing.T) bool {
 		var err error
-		actual, err = s.ArchiveSpanReader.GetTrace(context.Background(), spanstore.GetTraceParameters{TraceID: tID})
-		return err == nil && len(actual.Spans) == 1
+		iterTraces := s.ArchiveTraceReader.GetTraces(context.Background(), tracestore.GetTraceParams{TraceID: tID.ToOTELTraceID()})
+		traces, err := v1adapter.V1TracesFromSeq2(iterTraces)
+		if len(traces) > 0 {
+			actualTrace = traces[0]
+		}
+		return err == nil && len(actualTrace.Spans) == 1
 	})
 	require.True(t, found)
-	CompareTraces(t, &model.Trace{Spans: []*model.Span{expected}}, actual)
+	CompareTraces(t, expectedTrace, actualTrace)
 }
 
 func (s *StorageIntegration) testGetLargeSpan(t *testing.T) {

@@ -27,8 +27,8 @@ func (s *MemStorageIntegrationTestSuite) initialize(_ *testing.T) {
 	s.SamplingStore = memory.NewSamplingStore(2)
 	s.TraceReader = v1adapter.NewTraceReader(store)
 	s.TraceWriter = v1adapter.NewTraceWriter(store)
-	s.ArchiveSpanReader = archiveStore
-	s.ArchiveSpanWriter = archiveStore
+	s.ArchiveTraceReader = v1adapter.NewTraceReader(archiveStore)
+	s.ArchiveTraceWriter = v1adapter.NewTraceWriter(archiveStore)
 
 	// TODO DependencyWriter is not implemented in memory store
 
