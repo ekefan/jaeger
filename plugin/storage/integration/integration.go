@@ -43,14 +43,14 @@ var fixtures embed.FS
 // Some implementations may declare multiple tests, with different settings,
 // and RunAll() under different conditions.
 type StorageIntegration struct {
-	TraceWriter        tracestore.Writer
-	TraceReader        tracestore.Reader
+	TraceWriter       tracestore.Writer
+	TraceReader       tracestore.Reader
 	ArchiveTraceReader tracestore.Reader
 	ArchiveTraceWriter tracestore.Writer
-	DependencyWriter   dependencystore.Writer
-	DependencyReader   depstore.Reader
-	SamplingStore      samplingstore.Store
-	Fixtures           []*QueryFixtures
+	DependencyWriter  dependencystore.Writer
+	DependencyReader  depstore.Reader
+	SamplingStore     samplingstore.Store
+	Fixtures          []*QueryFixtures
 
 	// TODO: remove this after all storage backends return spanKind from GetOperations
 	GetOperationsMissingSpanKind bool

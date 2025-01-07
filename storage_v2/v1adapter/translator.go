@@ -4,6 +4,8 @@
 package v1adapter
 
 import (
+	"fmt"
+
 	jaegerTranslator "github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/jaeger"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/ptrace"
@@ -47,6 +49,7 @@ func V1TracesFromSeq2(otelSeq iter.Seq2[[]ptrace.Traces, error]) ([]*model.Trace
 		jaegerTraces []*model.Trace
 		iterErr      error
 	)
+	fmt.Println("AggregateTraces is called")
 	jptrace.AggregateTraces(otelSeq)(func(otelTrace ptrace.Traces, err error) bool {
 		if err != nil {
 			iterErr = err

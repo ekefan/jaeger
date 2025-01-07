@@ -133,22 +133,24 @@ func (s *ESStorageIntegration) initSpanstore(t *testing.T, allTagsAsFields bool)
 	f := s.initializeESFactory(t, allTagsAsFields)
 	s.factory = f
 	var err error
+	
 	spanWriter, err := f.CreateSpanWriter()
 	require.NoError(t, err)
 	s.TraceWriter = v1adapter.NewTraceWriter(spanWriter)
 	spanReader, err := f.CreateSpanReader()
 	require.NoError(t, err)
 	s.TraceReader = v1adapter.NewTraceReader(spanReader)
-	archiveTraceReader, err := f.CreateArchiveSpanReader()
+
+	archiveSpanReader, err := f.CreateArchiveSpanReader()
 	require.NoError(t, err)
-	s.ArchiveTraceReader = v1adapter.NewTraceReader(archiveTraceReader)
-	archiveTraceWriter, err := f.CreateArchiveSpanWriter()
+	s.ArchiveTraceReader = v1adapter.NewTraceReader(archiveSpanReader)
+	archiveSpanWriter, err := f.CreateArchiveSpanWriter()
 	require.NoError(t, err)
-	s.ArchiveTraceWriter = v1adapter.NewTraceWriter(archiveTraceWriter)
+	s.ArchiveTraceWriter = v1adapter.NewTraceWriter(archiveSpanWriter)
+
 	dependencyReader, err := f.CreateDependencyReader()
 	require.NoError(t, err)
 	s.DependencyReader = v1adapter.NewDependencyReader(dependencyReader)
-
 	s.DependencyWriter = dependencyReader.(dependencystore.Writer)
 
 	s.SamplingStore, err = f.CreateSamplingStore(1)
