@@ -212,7 +212,7 @@ func (s *StorageIntegration) testArchiveTrace(t *testing.T) {
 		if len(traces) > 0 {
 			actualTrace = traces[0]
 		}
-		
+
 		return err == nil && len(actualTrace.Spans) == 1
 	})
 	require.True(t, found)
