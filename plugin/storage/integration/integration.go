@@ -47,10 +47,10 @@ type StorageIntegration struct {
 	TraceReader        tracestore.Reader
 	ArchiveTraceReader tracestore.Reader
 	ArchiveTraceWriter tracestore.Writer
-	DependencyWriter  dependencystore.Writer
-	DependencyReader  depstore.Reader
-	SamplingStore     samplingstore.Store
-	Fixtures          []*QueryFixtures
+	DependencyWriter   dependencystore.Writer
+	DependencyReader   depstore.Reader
+	SamplingStore      samplingstore.Store
+	Fixtures           []*QueryFixtures
 
 	// TODO: remove this after all storage backends return spanKind from GetOperations
 	GetOperationsMissingSpanKind bool
@@ -212,6 +212,7 @@ func (s *StorageIntegration) testArchiveTrace(t *testing.T) {
 		if len(traces) > 0 {
 			actualTrace = traces[0]
 		}
+		
 		return err == nil && len(actualTrace.Spans) == 1
 	})
 	require.True(t, found)
