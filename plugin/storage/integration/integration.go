@@ -26,6 +26,7 @@ import (
 	"github.com/jaegertracing/jaeger/model"
 	"github.com/jaegertracing/jaeger/storage/dependencystore"
 	"github.com/jaegertracing/jaeger/storage/samplingstore"
+	"github.com/jaegertracing/jaeger/storage/spanstore"
 	"github.com/jaegertracing/jaeger/storage_v2/depstore"
 	"github.com/jaegertracing/jaeger/storage_v2/tracestore"
 	"github.com/jaegertracing/jaeger/storage_v2/v1adapter"
@@ -46,6 +47,7 @@ type StorageIntegration struct {
 	TraceWriter        tracestore.Writer
 	TraceReader        tracestore.Reader
 	ArchiveTraceReader tracestore.Reader
+	ArchiveSpanReader  spanstore.Reader
 	ArchiveTraceWriter tracestore.Writer
 	DependencyWriter   dependencystore.Writer
 	DependencyReader   depstore.Reader
@@ -211,6 +213,8 @@ func (s *StorageIntegration) testArchiveTrace(t *testing.T) {
 		traces, err := v1adapter.V1TracesFromSeq2(iterTraces)
 		if len(traces) > 0 {
 			actualTrace = traces[0]
+		} else {
+			actualTrace, err = s.ArchiveSpanReader.GetTrace(context.Background(), spanstore.GetTraceParameters{TraceID: tID})
 		}
 
 		return err == nil && len(actualTrace.Spans) == 1
